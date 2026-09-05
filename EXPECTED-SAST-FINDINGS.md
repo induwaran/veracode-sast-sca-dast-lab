@@ -41,6 +41,7 @@
 | SAST-035 | Unsafe yaml load | CWE-502 | A08 | `src/routes/api.js` | `yaml.load(y)` in `/api/yaml` | High | `yaml.load(y, {schema: SAFE})` + upgrade js-yaml |
 | SAST-036 | XSS via serialize-javascript | CWE-79 | A03 | `src/routes/api.js` | `serialize(obj)` in `/api/serialize` | High | JSON.stringify + CSP, upgrade serialize-javascript |
 | SAST-037 | ReDoS/path traversal via moment locale | CWE-400/22 | A05 | `src/routes/api.js` | `moment(d).format()` / `moment.locale` | Medium | upgrade moment, validate input |
+| SAST-038 | Missing CSRF token (CWE-352) | CWE-352 | A01 | `src/vulnerabilities/a05-misconfiguration.js` + `src/routes/api.js` | `csrfVulnerable` / `POST /api/csrf-demo-vulnerable` (no check) vs `csrfSecure` / `POST /api/csrf-demo-secure` | Medium | add `GET /api/csrf-token` + validate `_csrf` |
 
 ## Remediation pass
 

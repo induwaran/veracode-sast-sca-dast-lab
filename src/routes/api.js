@@ -3,6 +3,7 @@
 const express = require("express");
 const fs = require("node:fs");
 const path = require("node:path");
+const crypto = require("node:crypto");
 const { exec } = require("node:child_process");
 const Handlebars = require("handlebars");
 const serialize = require("serialize-javascript");
@@ -186,6 +187,22 @@ router.get("/api/yaml", requireLogin, (req, res) => {
 router.get("/api/moment", requireLogin, (req, res) => {
   const d = req.query.d || "2024-01-01";
   res.send(moment(d).format());
+});
+
+// CWE-352: CSRF — vulnerable POST without token vs secure with token
+router.get("/api/csrf-token", requireLogin, (req, res) => {
+  const token = crypto.randomBytes(16).toString("hex");
+  req.session.csrfToken = token;
+  res.json({ csrfToken: token });
+});
+router.post("/api/csrf-demo-vulnerable", requireLogin, (req, res) => {
+  // VULNERABLE: no CSRF check [CWE-352]
+  res.json({ ok: true, note: "no CSRF token required — vulnerable" });
+});
+router.post("/api/csrf-demo-secure", requireLogin, (req, res) => {
+  const a05 = require("../vulnerabilities/a05-misconfiguration");
+  if (!a05.csrfSecure(req)) return res.status(403).json({ error: "invalid CSRF token" });
+  res.json({ ok: true, note: "CSRF token validated" });
 });
 
 module.exports = router;

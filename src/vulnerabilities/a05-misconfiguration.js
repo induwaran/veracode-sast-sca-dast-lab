@@ -42,6 +42,17 @@ function corsSecure(allowedOrigins) {
   };
 }
 
+// VULNERABLE: missing CSRF token validation [CWE-352] — all state-changing
+// POSTs in the lab accept requests without a token; DAST flags this.
+function csrfVulnerable(req) {
+  return true; // no check
+}
+// SECURE: token must match session
+function csrfSecure(req) {
+  const token = req.body && req.body._csrf;
+  return !!token && token === req.session.csrfToken;
+}
+
 // Weak session cookie config used by default session middleware (see server.js).
 // SECURE alternative shown in applySecureCookieOptions.
 function weakCookieOptions() {
@@ -67,6 +78,8 @@ module.exports = {
   errorResponseSecure,
   corsVulnerable,
   corsSecure,
+  csrfVulnerable,
+  csrfSecure,
   weakCookieOptions,
   secureCookieOptions,
 };
