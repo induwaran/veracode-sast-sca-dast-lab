@@ -33,6 +33,14 @@ function createApp() {
   // Trust Render's proxy so secure cookies work behind TLS termination
   if (config.env === "production") app.set("trust proxy", 1);
 
+  // Single source of truth for visible version (v1, v1.1 …). Survives restarts,
+  // changes only when package.json or APP_VERSION env changes intentionally.
+  app.locals.appVersion = config.version;
+  app.use((req, res, next) => {
+    res.locals.appVersion = config.version;
+    next();
+  });
+
   // Session cookie: functional for browsers (lax + env-aware secure). The
   // intentionally weak configuration remains in src/vulnerabilities/a05-misconfiguration.js
   // as weakCookieOptions() for SAST/DAST (CWE-614) — not used for the live session.
@@ -58,7 +66,7 @@ function createApp() {
 
   // Public health endpoint (HTTP 200)
   app.get("/health", (req, res) => {
-    res.status(200).json({ status: "ok", service: "veracode-sast-sca-dast-lab" });
+    res.status(200).json({ status: "ok", service: "veracode-sast-sca-dast-lab", version: config.version });
   });
 
   app.use("/", indexRoutes);

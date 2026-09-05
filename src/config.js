@@ -1,6 +1,22 @@
 "use strict";
 
+function resolveAppVersion() {
+  const raw = process.env.APP_VERSION || "";
+  if (raw && /^v\d+(\.\d+)?$/.test(raw.trim())) return raw.trim();
+  try {
+    const pkg = require("../package.json");
+    const parts = String(pkg.version || "").split(".");
+    if (parts.length >= 2 && /^\d+$/.test(parts[0]) && /^\d+$/.test(parts[1])) {
+      const minor = parts[1] === "0" ? "" : `.${parts[1]}`;
+      return `v${parts[0]}${minor}`;
+    }
+    if (/^\d+$/.test(parts[0])) return `v${parts[0]}`;
+  } catch (e) {}
+  return "v1.4";
+}
+
 const config = {
+  version: resolveAppVersion(),
   env: process.env.NODE_ENV || "development",
   port: process.env.PORT || 3000,
   baseUrl: process.env.BASE_URL || "http://localhost:3000",

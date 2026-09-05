@@ -28,3 +28,5 @@ services:
         sync: false
       - key: LOCAL_ADMIN_PASSWORD
         sync: false
+      - key: APP_VERSION
+        value: v1.4

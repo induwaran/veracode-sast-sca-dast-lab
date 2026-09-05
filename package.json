@@ -1,6 +1,6 @@
 {
   "name": "veracode-sast-sca-dast-lab",
-  "version": "1.0.0",
+  "version": "1.4.0",
   "description": "Intentionally vulnerable Node.js/Express lab for demonstrating Veracode SAST, SCA and DAST against OWASP Top 10 (controlled security lab - do NOT use in production)",
   "main": "src/server.js",
   "scripts": {
