@@ -1,10 +1,26 @@
 # Veracode SAST + SCA + DAST Security Lab
 
+> **Independent security engineering lab — not an official Veracode product.**
+> Synthetic OWASP Top 10 vulnerabilities with runtime safety guards. Every flaw ships with a secure alternative. Do not use in production or with real data.
+
 Intentionally vulnerable Node.js/Express lab for demonstrating **Veracode SAST**, **SCA**, and **DAST** together against the [OWASP Top 10](https://owasp.org/Top10/) — plus API, dependency, and CI/CD security gates. Every vulnerability is synthetic, governed by runtime safety guards, and shipped with a secure alternative for before/after comparison.
 
 > **Controlled lab — do NOT use in production or expose to real data.**
 
 ## Architecture
+
+```mermaid
+graph TD
+  Dev[Developer + GitHub] --> Repo[veracode-sast-sca-dast-lab<br/>src / package.json / tests]
+  Repo --> Render[Render Free Web Service<br/>Node.js + /health + Entra ID SSO]
+  Repo --> SAST[Veracode SAST<br/>source scan]
+  Repo --> SCA[Veracode SCA<br/>package.json / lockfile]
+  Render --> DAST[Veracode DAST<br/>HTTPS URL]
+  Entra[Microsoft Entra ID<br/>OIDC Auth Code Flow] --> Render
+```
+
+<details>
+<summary>ASCII fallback</summary>
 
 ```
 Laptop (OpenCode + GitHub + Render MCP + Veracode)
@@ -23,6 +39,7 @@ Laptop (OpenCode + GitHub + Render MCP + Veracode)
                  ├─ SCA  → package.json + package-lock.json
                  └─ DAST → Render HTTPS URL
 ```
+</details>
 
 ## Technology
 
