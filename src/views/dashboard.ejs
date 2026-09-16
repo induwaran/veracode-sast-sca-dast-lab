@@ -2,7 +2,7 @@
 <h1>Dashboard</h1>
 <p class="banner"><%= banner %></p>
 <p>Signed in as <strong><%= user.email %></strong> (<%= user.role %>)</p>
-<p>Authentication Method: <strong><%= user.authMethod === 'local' ? 'Local Authentication' : user.authMethod === 'entra-sso' ? 'Microsoft Entra ID SSO' : user.authMethod %></strong></p>
+<p>Authentication Method: <strong><%= user.authMethod === 'local' ? 'Local Authentication' : user.authMethod === 'saml' ? 'SAML SSO' : user.authMethod %></strong></p>
 <ul>
   <li><a href="/profile">Profile</a></li>
   <li><a href="/products">Products</a></li>

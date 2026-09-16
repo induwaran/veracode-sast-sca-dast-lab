@@ -1,9 +1,41 @@
 <%- include('partials/header') %>
-<h1>Veracode SAST + SCA + DAST Security Lab</h1>
-<p>Intentionally vulnerable Node.js/Express application for demonstrating Veracode static analysis, software composition analysis, and dynamic analysis against the OWASP Top 10.</p>
+<h1>AppSec Test Lab</h1>
+<p class="tagline">Application security testing laboratory — designed for Veracode SAST/SCA/DAST demonstration against the OWASP Top 10.</p>
+
+<svg class="appsec-flow" viewBox="0 0 720 120" role="img" aria-labelledby="flowTitle flowDesc" xmlns="http://www.w3.org/2000/svg">
+  <title id="flowTitle">Application security testing flow</title>
+  <desc id="flowDesc">Application to API to security testing to cloud, with security inspection points along the flow.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"></path>
+    </marker>
+  </defs>
+  <g fill="none" stroke="#334155" stroke-width="1.5">
+    <rect x="10" y="38" width="120" height="44" rx="8"></rect>
+    <rect x="200" y="38" width="120" height="44" rx="8"></rect>
+    <rect x="390" y="38" width="120" height="44" rx="8"></rect>
+    <rect x="580" y="38" width="120" height="44" rx="8"></rect>
+    <line x1="130" y1="60" x2="198" y2="60" stroke="#64748b" marker-end="url(#arrow)"></line>
+    <line x1="320" y1="60" x2="388" y2="60" stroke="#64748b" marker-end="url(#arrow)"></line>
+    <line x1="510" y1="60" x2="578" y2="60" stroke="#64748b" marker-end="url(#arrow)"></line>
+  </g>
+  <g fill="none" stroke="#7dd3fc" stroke-width="1.5">
+    <path d="M70 46 l6 6 10-10" stroke-linecap="round" stroke-linejoin="round"></path>
+    <path d="M248 52 a12 12 0 1 1 -1 0" stroke-linecap="round"></path>
+    <path d="M450 46 l8 12 h-16 z" stroke-linejoin="round"></path>
+    <path d="M640 46 v28 M626 52 v16 a14 6 0 0 0 28 0 v-16" stroke-linecap="round"></path>
+  </g>
+  <g fill="#94a3b8" font-size="12" font-family="system-ui, sans-serif" text-anchor="middle">
+    <text x="70" y="102">Application</text>
+    <text x="260" y="102">API</text>
+    <text x="450" y="102">Security Testing</text>
+    <text x="640" y="102">Cloud / Infra</text>
+  </g>
+</svg>
+
 <ul>
   <li><a href="/health">/health</a> — public health check</li>
-  <li><a href="/login">/login</a> — Microsoft Entra ID authorization-code login</li>
+  <li><a href="/login">/login</a> — sign in (Local Authentication or SAML SSO)</li>
   <li><a href="/security-lab">/security-lab</a> — vulnerability catalog (requires login)</li>
 </ul>
 <p>All data in this application is synthetic. No real credentials are used anywhere.</p>

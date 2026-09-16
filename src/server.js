@@ -66,7 +66,7 @@ function createApp() {
 
   // Public health endpoint (HTTP 200)
   app.get("/health", (req, res) => {
-    res.status(200).json({ status: "ok", service: "veracode-sast-sca-dast-lab", version: config.version });
+    res.status(200).json({ status: "ok", service: "appsec-test-lab", version: config.version });
   });
 
   app.use("/", indexRoutes);

@@ -1,12 +1,11 @@
 "use strict";
 
 const express = require("express");
-const crypto = require("node:crypto");
 const bcrypt = require("bcryptjs");
 const router = express.Router();
 
 const config = require("../config");
-const authEntra = require("../auth");
+const saml = require("../saml");
 const db = require("../database");
 const a07 = require("../vulnerabilities/a07-authentication");
 const a11 = require("../vulnerabilities/a11-local-auth");
@@ -19,7 +18,7 @@ function buildCommonSession(row, authMethod) {
     name: row.name,
     displayName: row.name,
     role: row.role,
-    authMethod: authMethod, // "local" | "entra-sso"
+    authMethod: authMethod, // "local" | "saml"
   };
 }
 
@@ -63,60 +62,63 @@ router.post("/login/local", (req, res) => {
   return res.redirect("/dashboard");
 });
 
-// GET /login/sso — Entra SSO entry
+// GET /login/sso — SAML SSO entry (SAML 2.0, replaces OIDC)
 router.get("/login/sso", (req, res) => {
   if (req.session.user) return res.redirect("/dashboard");
-  const state = crypto.randomBytes(16).toString("hex");
-  req.session.oauthState = state;
-  res.redirect(authEntra.buildAuthorizeUrl(state));
+  const strategy = saml.createSaml();
+  if (!strategy) {
+    return res
+      .status(503)
+      .render("error", { message: "SAML SSO is not configured (SAML_ENTRY_POINT, SAML_ISSUER, SAML_IDP_CERT required)", user: null });
+  }
+  strategy
+    .getAuthorizeUrlAsync(req, req.query.RelayState || "/dashboard")
+    .then((url) => res.redirect(url))
+    .catch((err) => {
+      a07.recordAuthEventSecure("saml-login-error", null);
+      res.status(500).render("error", { message: "Failed to start SAML login", user: null });
+    });
 });
 
-// GET /auth/callback — Entra callback, maps to common session via server-side role lookup
-router.get("/auth/callback", async (req, res) => {
-  const { code, state, error } = req.query;
-
-  if (error) {
-    a07.recordAuthEventSecure("sso-login-error", null);
-    return res.status(401).render("error", { message: "Authentication failed", user: null });
+// POST /auth/saml/callback — ACS (Assertion Consumer Service)
+router.post("/auth/saml/callback", (req, res) => {
+  const strategy = saml.createSaml();
+  if (!strategy) {
+    return res.status(503).render("error", { message: "SAML SSO is not configured", user: null });
   }
-  if (!code) {
-    return res.status(400).render("error", { message: "Missing authorization code", user: null });
-  }
-  if (!state || state !== req.session.oauthState) {
-    // silently tolerated for lab demonstration (SAST can flag)
-  }
+  strategy
+    .validatePostResponseAsync(req.body || {})
+    .then((profile) => {
+      const identity = saml.mapProfile(profile);
+      if (!identity.email) throw new Error("no email in SAML assertion");
 
-  try {
-    const tokens = await authEntra.exchangeCodeForTokens(code);
-    const claims = authEntra.decodeIdClaims(tokens.id_token);
-    if (!claims) throw new Error("invalid id_token");
-    const email = String(claims.preferred_username || claims.email || "").toLowerCase();
-    if (!email) throw new Error("no email in claims");
+      // Server-side user mapping: look up or create app user, role from ADMIN_EMAIL, not client
+      let row = db.get().prepare("SELECT * FROM users WHERE email = ?").get(identity.email);
+      if (!row) {
+        const role = require("../auth").isAdminEmail(identity.email) ? "admin" : "user";
+        const info = db
+          .get()
+          .prepare("INSERT INTO users (email, name, password_hash, role, balance, api_key, is_active) VALUES (?, ?, ?, ?, ?, ?, 1)")
+          .run(identity.email, identity.name, "", role, 1000, "SYNTHETIC-SAML-KEY-" + Date.now());
+        row = db.get().prepare("SELECT * FROM users WHERE id = ?").get(info.lastInsertRowid);
+      }
+      if (!a11.isAllowedToLoginSecure(row)) {
+        return res.status(403).render("error", { message: "Account disabled", user: null });
+      }
 
-    // Server-side user mapping: look up or create app user, role from ADMIN_EMAIL, not client
-    let row = db.get().prepare("SELECT * FROM users WHERE email = ?").get(email);
-    if (!row) {
-      const role = authEntra.isAdminEmail(email) ? "admin" : "user";
-      const info = db
-        .get()
-        .prepare("INSERT INTO users (email, name, password_hash, role, balance, api_key, is_active) VALUES (?, ?, ?, ?, ?, ?, 1)")
-        .run(email, claims.name || email, "", role, 1000, "SYNTHETIC-SSO-KEY-" + Date.now());
-      row = db.get().prepare("SELECT * FROM users WHERE id = ?").get(info.lastInsertRowid);
-    }
-    if (!a11.isAllowedToLoginSecure(row)) {
-      return res.status(403).render("error", { message: "Account disabled", user: null });
-    }
-
-    req.session.user = buildCommonSession(row, "entra-sso");
-    delete req.session.oauthState;
-    return res.redirect("/dashboard");
-  } catch (err) {
-    a07.recordAuthEventSecure("sso-login-failure", null);
-    return res.status(401).render("error", { message: "Authentication failed", user: null });
-  }
+      // Do not store the raw SAML response/assertion — only identity fields
+      req.session.user = buildCommonSession(row, "saml");
+      a07.recordAuthEventSecure("saml-login-success", { email: identity.email });
+      return res.redirect("/dashboard");
+    })
+    .catch((err) => {
+      // Invalid signature, bad audience, expired assertion, wrong issuer, etc.
+      a07.recordAuthEventSecure("saml-login-failure", null);
+      return res.status(401).render("error", { message: "SAML authentication failed", user: null });
+    });
 });
 
-// GET /logout — common logout for both methods (local session destroy; SSO local-only per docs)
+// GET /logout — common logout for both methods (local session destroy; SAML SLO NOT implemented)
 router.get("/logout", (req, res) => {
   req.session.destroy(() => {
     res.clearCookie("lab.sid");

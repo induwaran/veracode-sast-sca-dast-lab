@@ -2,8 +2,9 @@
 <h1>Sign in</h1>
 <p>Choose an authentication method:</p>
 <div style="display:flex; gap:1rem; margin:1rem 0;">
-  <a href="/login/local" style="padding:0.75rem 1.5rem; background:#2563eb; color:white; text-decoration:none; border-radius:6px;">Local Login</a>
-  <a href="/login/sso" style="padding:0.75rem 1.5rem; background:#0f172a; color:white; text-decoration:none; border-radius:6px; border:1px solid #334155;">Sign in with Microsoft Entra ID</a>
+  <a href="/login/local" style="padding:0.75rem 1.5rem; background:#2563eb; color:white; text-decoration:none; border-radius:6px;">Local Authentication</a>
+  <a href="/login/sso" style="padding:0.75rem 1.5rem; background:#0f172a; color:white; text-decoration:none; border-radius:6px; border:1px solid #334155;">SAML SSO</a>
 </div>
-<p><small>Local Authentication — uses synthetic lab accounts (<code>dast-user@example.test</code> / <code>dast-admin@example.test</code>).<br>Microsoft Entra ID SSO — authorization-code flow, same session model.</small></p>
+<p><small><strong>Local Authentication</strong> — uses the synthetic lab accounts (<code>dast-user@example.test</code> / <code>dast-admin@example.test</code>, <code>admin@example.com</code>).<br>
+<strong>SAML SSO</strong> — sign in using the configured identity provider (SAML 2.0). Both flows create the same application session.</small></p>
 <%- include('partials/footer') %>

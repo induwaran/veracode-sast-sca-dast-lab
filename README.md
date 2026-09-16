@@ -1,6 +1,8 @@
-# Veracode SAST + SCA + DAST Security Lab
+# AppSec Test Lab
 
-Intentionally vulnerable Node.js/Express lab for demonstrating **Veracode SAST**, **SCA**, and **DAST** together against the [OWASP Top 10](https://owasp.org/Top10/) — plus API, dependency, and CI/CD security gates. Every vulnerability is synthetic, governed by runtime safety guards, and shipped with a secure alternative for before/after comparison.
+Application security testing laboratory — intentionally vulnerable Node.js/Express lab for demonstrating **Veracode SAST**, **SCA**, and **DAST** together against the [OWASP Top 10](https://owasp.org/Top10/) — plus API, dependency, and CI/CD security gates. Every vulnerability is synthetic, governed by runtime safety guards, and shipped with a secure alternative for before/after comparison.
+
+> Designed for Veracode SAST/SCA/DAST testing — branded **AppSec Test Lab**.
 
 > **Controlled lab — do NOT use in production or expose to real data.**
 
@@ -16,7 +18,7 @@ Laptop (OpenCode + GitHub + Render MCP + Veracode)
   │
   ├─ Render Free Web Service (Node.js)
   │              └─ https://<service>.onrender.com  (/health, /login, …)
-  │                    └─ Microsoft Entra ID (authorization-code flow)
+  │                    └─ SAML 2.0 IdP (or Local auth)
   │
   └─ Veracode
                  ├─ SAST → GitHub source
@@ -26,12 +28,12 @@ Laptop (OpenCode + GitHub + Render MCP + Veracode)
 
 ## Technology
 
-Node.js 20+, Express 4, EJS, `node:sqlite` (built-in), `express-session`, Microsoft Entra ID OIDC (hand-rolled authorization-code flow), Axios/node-fetch for SSRF demo, synthetic lodash/minimist/jsonwebtoken etc. pinned at historically-vulnerable versions for SCA.
+Node.js 20+, Express 4, EJS, `node:sqlite` (built-in), `express-session`, **SAML 2.0** via `@node-saml/node-saml` (replaced OIDC in v1.5), Axios/node-fetch for SSRF demo, synthetic lodash/minimist/jsonwebtoken etc. pinned at historically-vulnerable versions for SCA.
 
 ## Prerequisites
 
 - **Node.js 20+** and **npm** (for local) *or* **Docker** (for container)
-- Git, and a Microsoft Entra ID app registration *only* if you want SSO
+- Git, and a SAML 2.0 IdP app registration (e.g., Microsoft Entra ID SAML) *only* if you want SSO
 
 ## Installation
 
@@ -47,12 +49,12 @@ cp .env.example .env   # then edit .env — see Environment below
 |---|---:|---|
 | `NODE_ENV` | no | `development` locally, `production` on Render/Docker |
 | `PORT` | no | defaults to `3000` (Render injects `10000`) |
-| `BASE_URL` | SSO only | e.g. `http://localhost:3000` or `https://<service>.onrender.com` — callback is `BASE_URL + /auth/callback` |
+| `BASE_URL` | SSO only | e.g. `http://localhost:3000` or `https://<service>.onrender.com` — SAML ACS is `BASE_URL + /auth/saml/callback` |
 | `SESSION_SECRET` | yes | `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
 | `ADMIN_EMAIL` | no | `dast-admin@example.com` style — decides `/admin` access |
 | `LOCAL_AUTH_ENABLED` | no | `true` (default) |
 | `LOCAL_USER_PASSWORD` / `LOCAL_ADMIN_PASSWORD` | local DAST | lab-only synthetic passwords for `dast-user@example.test` / `dast-admin@example.test` (also `admin@example.com`/`Pass@!23` is seeded) |
-| `ENTRA_CLIENT_ID` / `ENTRA_CLIENT_SECRET` / `ENTRA_TENANT_ID` | SSO only | Entra app registration (scopes `openid profile email`) |
+| `SAML_ENTRY_POINT` / `SAML_ISSUER` / `SAML_IDP_CERT` (+ `SAML_CALLBACK_URL`) | SSO only | SAML IdP SSO URL, entity ID, X.509 cert — see `SAML-CONFIGURATION.md` |
 
 Only `.env.example` is committed — never commit `.env`.
 
@@ -99,21 +101,21 @@ docker logs -f veracode-lab
 curl http://localhost:3000/health
 ```
 
-Public routes need no login: `/`, `/health`, `/login`, `/login/local`, `/login/sso`, `/auth/callback`, `/logout`.
-Protected routes redirect to `/login`. Authentication offers **Local Login** (synthetic lab accounts `dast-user@example.test` / `dast-admin@example.test` and `admin@example.com`/`Pass@!23`) and **Microsoft Entra ID SSO**, both populating a common session (`authMethod: "local" | "entra-sso"`). Dashboard shows the method for DAST evidence.
+Public routes need no login: `/`, `/health`, `/login`, `/login/local`, `/login/sso`, `/auth/saml/callback`, `/logout`.
+Protected routes redirect to `/login`. Authentication offers **Local Authentication** and **SAML SSO**, both populating a common session (`authMethod: "local" | "saml"`). Synthetic lab accounts: `dast-user@example.test` / `dast-admin@example.test` and `admin@example.com`/`Pass@!23`. Dashboard shows the method for DAST evidence.
 
 ## Auth
 
-Microsoft Entra ID via `openid profile email`, authorization-code flow.
-Callback is derived from `BASE_URL` (never hard-coded): `BASE_URL + /auth/callback`.
-`ADMIN_EMAIL` determines who can access `/admin` (normal user → 403).
-Dashboard renders `AUTHENTICATED_DAST_TEST_USER` after login for authenticated DAST.
+**Local Authentication** (email + password, `bcryptjs`) and **SAML 2.0 SSO** via `@node-saml/node-saml` (see `SAML-CONFIGURATION.md` and `AUTHENTICATION.md`).
+SAML ACS is `BASE_URL + /auth/saml/callback` (or `SAML_CALLBACK_URL` if set).
+`ADMIN_EMAIL` determines who can access `/admin` (normal user → 403) for both methods.
+Dashboard renders `AUTHENTICATED_DAST_TEST_USER` and the authentication method after login.
 
-Env vars: `ENTRA_CLIENT_ID`, `ENTRA_CLIENT_SECRET`, `ENTRA_TENANT_ID`, `SESSION_SECRET`, `BASE_URL`, `ADMIN_EMAIL`, `LOCAL_AUTH_ENABLED`, `LOCAL_USER_PASSWORD`, `LOCAL_ADMIN_PASSWORD`. Only `.env.example` is committed.
+Env vars: `SAML_ENTRY_POINT`, `SAML_ISSUER`, `SAML_IDP_CERT`, `SAML_CALLBACK_URL`, `SESSION_SECRET`, `BASE_URL`, `ADMIN_EMAIL`, `LOCAL_AUTH_ENABLED`, `LOCAL_USER_PASSWORD`, `LOCAL_ADMIN_PASSWORD`. Only `.env.example` is committed.
 
 ## Routes
 
-- Public: `/`, `/health`, `/login`, `/auth/callback`, `/logout`
+- Public: `/`, `/health`, `/login`, `/auth/saml/callback`, `/logout`
 - Authenticated: `/dashboard`, `/profile`, `/products`, `/orders`, `/admin`, `/search`, `/comments`, `/upload`, `/redirect`, `/api`, `/security-lab`
 - API: `/api/users`, `/api/products`, `/api/orders`, `/api/profile` plus `-secure` variants and synthetic `/api/lab-target`
 
@@ -132,7 +134,7 @@ Env vars: `ENTRA_CLIENT_ID`, `ENTRA_CLIENT_SECRET`, `ENTRA_TENANT_ID`, `SESSION_
 |---|---|
 | `SAST-TEST-PLAN.md` | How to run Veracode SAST |
 | `SCA-TEST-PLAN.md` | How to run Veracode SCA + remediation workflow |
-| `DAST-TEST-PLAN.md` | Unauthenticated + authenticated DAST, Entra login, SIDE |
+| `DAST-TEST-PLAN.md` | Unauthenticated + authenticated DAST, SAML SSO login, SIDE |
 | `OWASP-MAPPING.md` | OWASP → CWE → file → SAST/SCA/DAST coverage |
 | `EXPECTED-SAST-FINDINGS.md` | Expected (not guaranteed) SAST findings |
 | `EXPECTED-SCA-FINDINGS.md` | Vulnerable deps, CVEs, fixed versions |

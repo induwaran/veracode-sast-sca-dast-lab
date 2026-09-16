@@ -27,20 +27,16 @@ const config = {
     userPassword: process.env.LOCAL_USER_PASSWORD || "",
     adminPassword: process.env.LOCAL_ADMIN_PASSWORD || "",
   },
-  entra: {
-    clientId: process.env.ENTRA_CLIENT_ID || "",
-    clientSecret: process.env.ENTRA_CLIENT_SECRET || "",
-    tenantId: process.env.ENTRA_TENANT_ID || "common",
-    scopes: "openid profile email",
-    authorizeUrl(tenant) {
-      return `https://login.microsoftonline.com/${tenant}/oauth2/v2.0/authorize`;
-    },
-    tokenUrl(tenant) {
-      return `https://login.microsoftonline.com/${tenant}/oauth2/v2.0/token`;
-    },
-    issuer(tenant) {
-      return `https://login.microsoftonline.com/${tenant}/v2.0`;
-    },
+  saml: {
+    entryPoint: process.env.SAML_ENTRY_POINT || "",
+    issuer: process.env.SAML_ISSUER || "",
+    callbackUrl: process.env.SAML_CALLBACK_URL || "", // falls back to BASE_URL + /auth/saml/callback
+    idpCert: process.env.SAML_IDP_CERT || "",
+    idpIssuer: process.env.SAML_IDP_ISSUER || "",
+    identifierFormat: process.env.SAML_IDENTIFIER_FORMAT || "",
+    wantAuthnResponseSigned: process.env.SAML_WANT_RESPONSE_SIGNED === "true",
+    emailAttribute: process.env.SAML_EMAIL_ATTRIBUTE || "",
+    nameAttribute: process.env.SAML_NAME_ATTRIBUTE || "",
   },
 };
 

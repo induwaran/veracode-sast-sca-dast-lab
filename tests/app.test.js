@@ -164,17 +164,34 @@ describe("security headers", () => {
 });
 
 describe("local + SSO auth (integration)", () => {
-  test("GET /login shows both options, /login/local form, /login/sso redirects", async () => {
+  test("GET /login shows both options, /login/local form, /login/sso handles SAML", async () => {
     const server = await startServer();
     try {
       const base = getBase(server);
       const login = await fetch(`${base}/login`);
       assert.equal(login.status, 200);
       const html = await login.text();
-      assert.match(html, /Local Login/);
-      assert.match(html, /Microsoft Entra ID/);
+      assert.match(html, /Local Authentication/);
+      assert.match(html, /SAML SSO/);
       assert.equal((await fetch(`${base}/login/local`)).status, 200);
-      assert.equal((await fetch(`${base}/login/sso`, { redirect: "manual" })).status, 302);
+      // SAML not configured in test env → 503 with explanatory message
+      const sso = await fetch(`${base}/login/sso`, { redirect: "manual" });
+      assert.equal(sso.status, 503);
+      assert.match(await sso.text(), /SAML SSO is not configured/);
+    } finally { server.close(); }
+  });
+
+  test("POST /auth/saml/callback without SAML config → 503, with bad SAML → 401", async () => {
+    const server = await startServer();
+    try {
+      const base = getBase(server);
+      const r = await fetch(`${base}/auth/saml/callback`, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "SAMLResponse=invalid",
+      });
+      // No SAML_IDP cert → 503 not configured
+      assert.equal(r.status, 503);
     } finally { server.close(); }
   });
 

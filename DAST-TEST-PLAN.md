@@ -6,13 +6,13 @@ Target: `https://<render-service>.onrender.com` (Render Free, HTTPS).
 
 - Render service deployed and `/health` returns 200.
 - `BASE_URL` env var set to the actual Render URL on the service.
-- Entra ID app registration created (redirect URI = `BASE_URL + /auth/callback`), `ADMIN_EMAIL` set, test identities provisioned.
+- SAML IdP application created (ACS URL = `BASE_URL + /auth/saml/callback` — see `SAML-CONFIGURATION.md`), `ADMIN_EMAIL` set, test identities provisioned.
 
 ## Scan 1 — Unauthenticated
 
 In Veracode DAST (or approved scanner), run an unauthenticated crawl of the Render URL.
 
-Expected coverage: `/`, `/health`, `/login`. Protected routes redirect to Entra — unauthenticated DAST confirms they are not anonymous.
+Expected coverage: `/`, `/health`, `/login`. Protected routes redirect to `/login` — unauthenticated DAST confirms they are not anonymous.
 
 Expected findings: DAST-001, DAST-002, DAST-011 (see `EXPECTED-DAST-FINDINGS.md`).
 
@@ -20,10 +20,10 @@ Expected findings: DAST-001, DAST-002, DAST-011 (see `EXPECTED-DAST-FINDINGS.md`
 
 Use Veracode's authenticated crawl. Options (in preference order):
 
-1. **AI-assisted login** (if available in your Veracode DAST product) — point at `/login` and let the assistant follow the Entra redirect, consent, and callback to `/dashboard`.
-2. **Selenium IDE (.side)** — create `veracode-entra-login.side` and `veracode-crawl.side`:
+1. **AI-assisted login** (if available in your Veracode DAST product) — point at `/login` and let the assistant follow the SAML SSO redirect (via the IdP) and ACS `POST /auth/saml/callback` to `/dashboard`.
+2. **Selenium IDE (.side)** — create `veracode-saml-login.side` and `veracode-crawl.side`:
    ```
-   / -> /login -> Entra sign-in (email, password, consent) -> /auth/callback -> /dashboard
+   / -> /login -> SAML SSO (via IdP) -> POST /auth/saml/callback -> /dashboard
      -> /profile -> /products -> /products/1 -> /search?q=security -> /comments
      -> /orders -> /api -> /security-lab
    ```
@@ -43,4 +43,4 @@ Document which mechanism was used.
 
 ## Safety
 
-Do not attempt MFA bypass, credential theft, or auth bypass. Use only the provisioned `dast-user@example.com` / `dast-admin@example.com` synthetic identities (or your tenant's Entra test users).
+Do not attempt MFA bypass, credential theft, or auth bypass. Use only the provisioned `dast-user@example.test` / `dast-admin@example.test` and `admin@example.com` synthetic identities (and your IdP test users if SAML is configured).
