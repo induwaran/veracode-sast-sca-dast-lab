@@ -1,7 +1,14 @@
-  </main>
-  <footer style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
-    <p>AppSec Test Lab — controlled security lab, intentionally vulnerable. Do NOT use in production.</p>
-    <span class="app-version" title="Application version (from package.json / APP_VERSION)"><%= appVersion %></span>
-  </footer>
+</main>
+
+<div class="hazard">
+<p>All data in this lab is synthetic — no real credentials are used anywhere. Intentionally vulnerable by design; do not deploy to production.</p>
+<span class="rev"><%= appVersion %> · not for production</span>
+</div>
+
+<footer class="meta">
+<span>AppSec Test Lab</span>
+<span>reference: veracode-sast-sca-dast-lab.onrender.com · <%= appVersion %></span>
+</footer>
+</div>
 </body>
 </html>

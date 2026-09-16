@@ -1,25 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>AppSec Test Lab</title>
-  <meta name="description" content="Application security testing laboratory — designed for Veracode SAST/SCA/DAST demonstration">
-  <link rel="stylesheet" href="/css/main.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AppSec Test Lab</title>
+<meta name="description" content="Application security testing laboratory — designed for Veracode SAST/SCA/DAST demonstration">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/main.css">
 </head>
 <body>
-  <nav>
-    <a href="/">Home</a>
-    <% if (user) { %>
-      <a href="/dashboard">Dashboard</a>
-      <a href="/products">Products</a>
-      <a href="/orders">Orders</a>
-      <a href="/comments">Comments</a>
-      <a href="/security-lab">Security Lab</a>
-      <% if (user.role === 'admin') { %><a href="/admin">Admin</a><% } %>
-      <a href="/logout">Logout</a>
-      <span class="who"><%= user.email %></span>
-    <% } else { %>
-      <a href="/login">Login (Entra ID)</a>
-    <% } %>
-  </nav>
-  <main>
+<div class="sheet">
+<span class="reg tl"></span>
+<span class="reg tr"></span>
+<span class="reg bl"></span>
+<span class="reg br"></span>
+
+<div class="titleblock">
+<div>
+<div class="mark"><span class="dot"></span></div>
+<h1 class="name">AppSec Test Lab</h1>
+<p class="tagline">Application security testing lab, built for Veracode SAST / SCA / DAST demonstration against the OWASP Top 10.</p>
+</div>
+<div class="fields">
+<div class="field"><span class="k">Drawing</span><span class="v">SEC-2026-LAB</span></div>
+<div class="field"><span class="k">Rev</span><span class="v"><%= appVersion %></span></div>
+<div class="field"><span class="k">Scale</span><span class="v">n.t.s.</span></div>
+<div class="field"><span class="k">Status</span><span class="v flag">synthetic data</span></div>
+</div>
+</div>
+
+<nav class="navstrip">
+<a href="/" class="<%= currentPath === '/' ? 'current' : '' %>">Home</a>
+<% if (user) { %>
+<a href="/dashboard" class="<%= currentPath === '/dashboard' ? 'current' : '' %>">Dashboard</a>
+<a href="/security-lab" class="<%= currentPath === '/security-lab' ? 'current' : '' %>">/security-lab</a>
+<span class="who"><%= user.email %> · <%= user.authMethod === 'local' ? 'local' : 'saml' %></span>
+<a href="/logout">Logout</a>
+<% } else { %>
+<a href="/login" class="<%= currentPath && currentPath.startsWith('/login') ? 'current' : '' %>">Login — SAML SSO</a>
+<a href="/security-lab" class="locked">/security-lab (requires login)</a>
+<% } %>
+</nav>
+
+<main>

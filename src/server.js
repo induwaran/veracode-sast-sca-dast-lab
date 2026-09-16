@@ -38,6 +38,8 @@ function createApp() {
   app.locals.appVersion = config.version;
   app.use((req, res, next) => {
     res.locals.appVersion = config.version;
+    res.locals.currentPath = req.path;
+    res.locals.user = req.session && req.session.user ? req.session.user : null;
     next();
   });
 
