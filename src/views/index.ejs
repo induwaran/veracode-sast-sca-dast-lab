@@ -1,72 +1,169 @@
 <%- include('partials/header') %>
 
-<section>
-<div class="section-label"><span class="idx">01</span><span>request path, traced end to end</span><span class="rule"></span></div>
-<p class="lede">One request, four inspection points — from the browser down to the infrastructure it lands on.</p>
-
-<div class="flow">
-<span class="scanline"></span>
-
-<div class="flow-node">
-<div class="badge">01</div>
-<div class="label">Application</div>
-<div class="sub">browser / client</div>
+<section class="hero">
+<div class="hero-eyebrow">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+Interactive Architecture
 </div>
-<div class="flow-connector"><span class="num">a</span></div>
+<h2>Trace how requests travel through your security scan surface.</h2>
+<p>Explore how modern application security tooling evaluates code, APIs, and cloud containers. Follow a sample request from the user's browser all the way to its underlying target environment.</p>
+</section>
 
-<div class="flow-node">
-<div class="badge">02</div>
-<div class="label">API</div>
-<div class="sub">/health · /login</div>
+<section class="pipeline-section">
+<div class="section-header">
+<div>
+<h3 class="section-title"><span>The End-to-End Request Path</span></h3>
 </div>
-<div class="flow-connector"><span class="num">b</span></div>
-
-<div class="flow-node">
-<div class="badge">03</div>
-<div class="label">Security Testing</div>
-<div class="sub">SAST / DAST / SCA</div>
-</div>
-<div class="flow-connector"><span class="num">c</span></div>
-
-<div class="flow-node">
-<div class="badge">04</div>
-<div class="label">Cloud / Infra</div>
-<div class="sub">deployment target</div>
-</div>
+<span class="section-subtitle">4 key inspection layers</span>
 </div>
 
-<div class="callouts">
-<div class="callout"><span class="n">a</span><p><strong>Client to API.</strong> Every request is unauthenticated until it reaches <span class="path" style="color:var(--line)">/login</span>.</p></div>
-<div class="callout"><span class="n">b</span><p><strong>API to test surface.</strong> Endpoints are intentionally seeded with OWASP Top 10 findings for tools to catch.</p></div>
-<div class="callout"><span class="n">c</span><p><strong>Findings to infra.</strong> Results trace back to where the vulnerable code actually runs.</p></div>
+<div class="pipeline-grid">
+<div class="pipeline-card">
+<div class="card-top">
+<span class="step-number">Step 01</span>
+<div class="card-icon client">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+</div>
+</div>
+<h3>Application Client</h3>
+<div class="role">Browser & Frontend</div>
+<p>Every inbound user request originates unauthenticated until reaching our credential validation gateway.</p>
+</div>
+
+<div class="pipeline-card">
+<div class="card-top">
+<span class="step-number">Step 02</span>
+<div class="card-icon api">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+</div>
+</div>
+<h3>API Gateway</h3>
+<div class="role">/health · /login</div>
+<p>Routes incoming traffic, manages access tokens, and controls access to internal lab endpoints.</p>
+</div>
+
+<div class="pipeline-card">
+<div class="card-top">
+<span class="step-number">Step 03</span>
+<div class="card-icon security">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+</div>
+</div>
+<h3>Security Inspection</h3>
+<div class="role">SAST / DAST / SCA</div>
+<p>Endpoints are intentionally modeled with OWASP Top 10 patterns for automated scanners to identify.</p>
+</div>
+
+<div class="pipeline-card">
+<div class="card-top">
+<span class="step-number">Step 04</span>
+<div class="card-icon cloud">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+</div>
+</div>
+<h3>Cloud Runtime</h3>
+<div class="role">Container & Host</div>
+<p>Connects detected source vulnerabilities directly to the live container context where code executes.</p>
+</div>
 </div>
 </section>
 
-<section>
-<div class="section-label"><span class="idx">02</span><span>endpoint schedule</span><span class="rule"></span></div>
+<section class="endpoints-section">
+<div class="table-header-bar">
+<div>
+<h3>Endpoint Directory & Access Control</h3>
+<p class="hint">Check availability, access levels, and security requirements for test routes</p>
+</div>
+</div>
 
-<table class="spec">
+<table class="endpoint-table">
 <thead>
-<tr><th>Path</th><th>Access</th><th>Description</th></tr>
+<tr>
+<th>Route / Path</th>
+<th>Access Level</th>
+<th>Description & Purpose</th>
+<th style="text-align: right;">Action</th>
+</tr>
 </thead>
 <tbody>
 <tr>
-<td class="path"><a href="/health" style="color:inherit; text-decoration:none;">/health</a></td>
-<td><span class="access-tag public"><span class="sw"></span>public</span></td>
-<td class="desc">Health check — no authentication required.</td>
+<td>
+<span class="route-pill">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted)"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+/health
+</span>
+</td>
+<td>
+<span class="badge-tag public">
+<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>
+Public
+</span>
+</td>
+<td class="desc-cell">Lightweight availability probe. Returns uptime and service readiness without authentication.</td>
+<td style="text-align: right;">
+<a href="/health" class="action-btn">Test Probe</a>
+</td>
 </tr>
 <tr>
-<td class="path"><a href="/login" style="color:inherit; text-decoration:none;">/login</a></td>
-<td><span class="access-tag auth"><span class="sw"></span>authenticate</span></td>
-<td class="desc">Sign in via local authentication or SAML SSO.</td>
+<td>
+<span class="route-pill">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted)"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+/login
+</span>
+</td>
+<td>
+<span class="badge-tag auth">
+<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+Authentication Required
+</span>
+</td>
+<td class="desc-cell">Identity federation endpoint supporting both local credentials and enterprise SAML / SSO.</td>
+<td style="text-align: right;">
+<a href="/login" class="action-btn">Sign In</a>
+</td>
 </tr>
 <tr>
-<td class="path"><a href="/security-lab" style="color:inherit; text-decoration:none;">/security-lab</a></td>
-<td><span class="access-tag protected"><span class="sw"></span>protected</span></td>
-<td class="desc">Vulnerability catalog. Requires an active session from /login.</td>
+<td>
+<span class="route-pill">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted)"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+/security-lab
+</span>
+</td>
+<td>
+<span class="badge-tag protected">
+<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+Protected Surface
+</span>
+</td>
+<td class="desc-cell">Comprehensive vulnerability catalog and interactive test targets. Requires verified session tokens.</td>
+<td style="text-align: right;">
+<a href="/security-lab" class="action-btn" style="opacity: 0.85;">Unlock Lab</a>
+</td>
 </tr>
 </tbody>
 </table>
 </section>
+
+<div class="learning-card">
+<div class="learning-content">
+<div class="info-icon-wrapper">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+</div>
+<div class="learning-text">
+<h4>Safe Learning by Design</h4>
+<p>This application is intentionally crafted for security demonstrations with synthetic datasets. Feel free to inspect payloads, execute scanner scans, and trace finding lifecycles safely.</p>
+</div>
+</div>
+<div class="lab-meta-stats">
+<div class="meta-stat">
+<span class="label">Architecture</span>
+<span class="val">Micro-tier</span>
+</div>
+<div class="meta-stat">
+<span class="label">Target Spec</span>
+<span class="val">OWASP Top 10</span>
+</div>
+</div>
+</div>
 
 <%- include('partials/footer') %>
