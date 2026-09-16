@@ -12,12 +12,6 @@ services:
         value: production
       - key: BASE_URL
         sync: false
-      - key: ENTRA_CLIENT_ID
-        sync: false
-      - key: ENTRA_CLIENT_SECRET
-        sync: false
-      - key: ENTRA_TENANT_ID
-        sync: false
       - key: SESSION_SECRET
         generateValue: true
       - key: ADMIN_EMAIL
