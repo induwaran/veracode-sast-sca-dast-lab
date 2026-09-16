@@ -29,4 +29,4 @@ services:
       - key: SAML_IDP_CERT
         sync: false
       - key: APP_VERSION
-        value: v1.5
+        value: v1.6

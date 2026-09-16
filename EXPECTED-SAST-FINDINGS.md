@@ -42,6 +42,25 @@
 | SAST-036 | XSS via serialize-javascript | CWE-79 | A03 | `src/routes/api.js` | `serialize(obj)` in `/api/serialize` | High | JSON.stringify + CSP, upgrade serialize-javascript |
 | SAST-037 | ReDoS/path traversal via moment locale | CWE-400/22 | A05 | `src/routes/api.js` | `moment(d).format()` / `moment.locale` | Medium | upgrade moment, validate input |
 | SAST-038 | Missing CSRF token (CWE-352) | CWE-352 | A01 | `src/vulnerabilities/a05-misconfiguration.js` + `src/routes/api.js` | `csrfVulnerable` / `POST /api/csrf-demo-vulnerable` (no check) vs `csrfSecure` / `POST /api/csrf-demo-secure` | Medium | add `GET /api/csrf-token` + validate `_csrf` |
+| SAST-039 | Sensitive data exposure (env/config) | CWE-200 | A01/A05 | `src/vulnerabilities/juice-bench.js` | `getConfigVulnerable` / `GET /api/juice/config` | High | `getConfigSecure` |
+| SAST-040 | Sensitive logs exposure | CWE-532 | A09 | `src/vulnerabilities/juice-bench.js` | `getLogsVulnerable` / `GET /api/juice/access-log` | Medium | `getLogsSecure` (admin check) |
+| SAST-041 | NoSQL injection (object injection) | CWE-943 | A03 | `src/vulnerabilities/juice-bench.js` | `nosqlLoginVulnerable` / `POST /api/juice/nosql-login` | High | `nosqlLoginSecure` |
+| SAST-042 | LDAP injection (filter concat) | CWE-90 | A03 | `src/vulnerabilities/juice-bench.js` | `ldapSearchVulnerable` / `GET /api/juice/ldap` | High | `ldapSearchSecure` |
+| SAST-043 | Insecure coupon (business logic) | CWE-20 | A04 | `src/vulnerabilities/juice-bench.js` | `applyCouponVulnerable` / `POST /api/juice/coupon` | Medium | `applyCouponSecure` |
+| SAST-044 | Negative quantity (input validation) | CWE-20 | A04 | `src/vulnerabilities/juice-bench.js` | `addToBasketVulnerable` / `POST /api/juice/basket` | Medium | `addToBasketSecure` |
+| SAST-045 | Broken access control (admin registration) | CWE-862 | A01 | `src/vulnerabilities/juice-bench.js` | `registerVulnerable` / `POST /api/juice/register` | High | `registerSecure` |
+| SAST-046 | DOM XSS (innerHTML) | CWE-79 | A03 | `src/vulnerabilities/juice-bench.js` | `domXssVulnerable` / `GET /api/juice/dom-xss` | High | `domXssSecure` |
+| SAST-047 | Stored XSS via API (no sanitization) | CWE-79 | A03 | `src/vulnerabilities/juice-bench.js` | `apiXssVulnerable` / `POST /api/juice/api-xss` | High | `apiXssSecure` |
+| SAST-048 | JWT none algorithm | CWE-345 | A07 | `src/vulnerabilities/juice-bench.js` | `jwtNoneVulnerable` / `POST /api/juice/jwt-none` | Critical | use RS256 with strong secret |
+| SAST-049 | JWT weak secret | CWE-798 | A07 | `src/vulnerabilities/juice-bench.js` | `jwtWeakVulnerable` / `POST /api/juice/jwt-weak` | High | strong secret |
+| SAST-050 | 2FA bypass (hardcoded) | CWE-287 | A07 | `src/vulnerabilities/juice-bench.js` | `verify2faVulnerable` / `POST /api/juice/2fa-bypass` | High | `verify2faSecure` |
+| SAST-051 | Debug info exposure (stack/env) | CWE-215 | A05 | `src/vulnerabilities/juice-bench.js` | `debugVulnerable` / `GET /api/juice/debug` | Medium | `debugSecure` |
+| SAST-052 | Permissive CORS wildcard | CWE-942 | A05 | `src/vulnerabilities/juice-bench.js` | `corsWildcardVulnerable` | Medium | strict allowlist |
+| SAST-053 | Weak random token | CWE-338 | A02 | `src/vulnerabilities/juice-bench.js` | `weakRandomVulnerable` / `GET /api/juice/weak-random` | Medium | `weakRandomSecure` |
+| SAST-054 | Hardcoded IV (static) | CWE-329 | A02 | `src/vulnerabilities/juice-bench.js` | `hardcodedIvVulnerable` / `GET /api/juice/hardcoded-iv` | High | random IV |
+| SAST-055 | CAPTCHA bypass | CWE-307 | A07 | `src/vulnerabilities/juice-bench.js` | `captchaBypassVulnerable` / `POST /api/juice/captcha-bypass` | Medium | `captchaSecure` |
+| SAST-056 | Prototype pollution (lodash merge) | CWE-915 | A08 | `src/vulnerabilities/juice-bench.js` | `deserializeVulnerable` / `POST /api/juice/deserialize` | High | `deserializeSecure` |
+| SAST-057 | Hidden endpoint (security through obscurity) | CWE-538 | A05 | `src/vulnerabilities/juice-bench.js` | `hiddenEndpointVulnerable` / `GET /api/juice/hidden` | Low | remove obscurity |
 
 ## Remediation pass
 

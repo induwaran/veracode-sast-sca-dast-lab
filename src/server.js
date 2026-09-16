@@ -21,6 +21,7 @@ const commentsRoutes = require("./routes/comments");
 const uploadRoutes = require("./routes/upload");
 const redirectRoutes = require("./routes/redirect");
 const apiRoutes = require("./routes/api");
+const juiceRoutes = require("./routes/juice");
 const securityLabRoutes = require("./routes/securityLab");
 
 function createApp() {
@@ -38,8 +39,6 @@ function createApp() {
   app.locals.appVersion = config.version;
   app.use((req, res, next) => {
     res.locals.appVersion = config.version;
-    res.locals.currentPath = req.path;
-    res.locals.user = req.session && req.session.user ? req.session.user : null;
     next();
   });
 
@@ -66,6 +65,13 @@ function createApp() {
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
 
+  // Expose user + path after session is available (for header nav)
+  app.use((req, res, next) => {
+    res.locals.currentPath = req.path;
+    res.locals.user = req.session && req.session.user ? req.session.user : null;
+    next();
+  });
+
   // Public health endpoint (HTTP 200)
   app.get("/health", (req, res) => {
     res.status(200).json({ status: "ok", service: "appsec-test-lab", version: config.version });
@@ -83,6 +89,7 @@ function createApp() {
   app.use("/", uploadRoutes);
   app.use("/", redirectRoutes);
   app.use("/", apiRoutes);
+  app.use("/", juiceRoutes);
 
   // SECURE example area: strict headers applied to /security-lab only
   app.use("/security-lab", applySecureHeaders, securityLabRoutes);

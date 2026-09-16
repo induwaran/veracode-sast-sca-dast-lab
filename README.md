@@ -132,11 +132,13 @@ Env vars: `SAML_ENTRY_POINT`, `SAML_ISSUER`, `SAML_IDP_CERT`, `SAML_CALLBACK_URL
 
 ## Routes
 
-- Public: `/`, `/health`, `/login`, `/auth/saml/callback`, `/logout`
+- Public: `/`, `/health`, `/login`, `/auth/saml/callback`, `/logout`, `/api/juice/*` (many intentionally public for DAST)
 - Authenticated: `/dashboard`, `/profile`, `/products`, `/orders`, `/admin`, `/search`, `/comments`, `/upload`, `/redirect`, `/api`, `/security-lab`
-- API: `/api/users`, `/api/products`, `/api/orders`, `/api/profile` plus `-secure` variants and synthetic `/api/lab-target`
+- API: `/api/users`, `/api/products`, `/api/orders`, `/api/profile` plus `-secure` variants, synthetic `/api/lab-target`, and **Juice Shop benchmark** `/api/juice/*` (19 new vulnerable pairs: config/logs, NoSQL/LDAP, coupon/basket, register, DOM/API XSS, JWT none/weak, 2FA bypass, debug, CORS, weak-random, hardcoded-IV, CAPTCHA, deserialization, hidden)
 
 ## Security Lab
+
+Benchmarked against **[OWASP Juice Shop](https://github.com/juice-shop/juice-shop) (116 challenges)** — the lab now mirrors Juice Shop's depth and breadth across Sensitive Data Exposure, Injection (SQL/NoSQL/LDAP), Input Validation, Broken Access Control, XSS (reflected/stored/DOM/API), Broken Authentication (JWT none/weak, 2FA bypass), Misconfiguration, Cryptography (weak random, hardcoded IV), Observability, Anti-Automation, Security through Obscurity, Deserialization (prototype pollution), and Unvalidated Redirects. New Juice Shop bench under `src/vulnerabilities/juice-bench.js` and `src/routes/juice.js` (`/api/juice/*`) provides 19 vulnerable/secure pairs; **no existing coverage was decreased**.
 
 `/security-lab` (login required) lists every OWASP category with vulnerable/secure endpoints. Runtime guards (see `SECURITY-TESTING.md`) keep live demos contained:
 

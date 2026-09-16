@@ -1,6 +1,6 @@
 {
   "name": "veracode-sast-sca-dast-lab",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "AppSec Test Lab — intentionally vulnerable Node.js/Express lab for demonstrating Veracode SAST/SCA/DAST against OWASP Top 10 (controlled security lab - do NOT use in production)",
   "main": "src/server.js",
   "scripts": {
